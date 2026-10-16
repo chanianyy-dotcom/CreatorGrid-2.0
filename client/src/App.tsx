@@ -1,42 +1,41 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import { Route, Switch, useRoute } from "wouter";
+import { Landing, LoginPage } from "./pages/Landing";
+import Pricing from "./pages/Pricing";
+import CreatorApp from "./pages/CreatorApp";
+import NotFound from "./pages/NotFound";
 
+function ContentRoute() {
+  const [, params] = useRoute("/app/content/:id");
+  return <CreatorApp section="content" contentId={params?.id} />;
+}
+function BriefRoute() {
+  const [, params] = useRoute("/app/brief/:id");
+  return <CreatorApp section="brief" contentId={params?.id} />;
+}
 function Router() {
-  // make sure to consider if you need authentication for certain routes
-  return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
-  );
+  return <Switch>
+    <Route path="/" component={Landing} />
+    <Route path="/login" component={LoginPage} />
+    <Route path="/pricing" component={Pricing} />
+    <Route path="/app" component={() => <CreatorApp section="dashboard" />} />
+    <Route path="/app/calendar" component={() => <CreatorApp section="calendar" />} />
+    <Route path="/app/board" component={() => <CreatorApp section="board" />} />
+    <Route path="/app/library" component={() => <CreatorApp section="library" />} />
+    <Route path="/app/assets" component={() => <CreatorApp section="assets" />} />
+    <Route path="/app/approvals" component={() => <CreatorApp section="approvals" />} />
+    <Route path="/app/performance" component={() => <CreatorApp section="performance" />} />
+    <Route path="/app/settings" component={() => <CreatorApp section="settings" />} />
+    <Route path="/app/content/:id" component={ContentRoute} />
+    <Route path="/app/brief/:id" component={BriefRoute} />
+    <Route path="/404" component={NotFound} />
+    <Route component={NotFound} />
+  </Switch>;
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
-function App() {
-  return (
-    <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
-  );
+export default function App() {
+  return <ErrorBoundary><ThemeProvider defaultTheme="light"><TooltipProvider><Toaster /><Router /></TooltipProvider></ThemeProvider></ErrorBoundary>;
 }
-
-export default App;

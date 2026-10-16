@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, approvals, assets, contentItems, users, workspaces } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -88,4 +88,33 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function getWorkspaceSnapshot() {
+  const fallback = {
+    mode: "demo-fallback" as const,
+    workspace: { name: "Signal Notes", slug: "signal-notes" },
+    counts: { content: 8, approvals: 3, assets: 27 },
+  };
+  const db = await getDb();
+  if (!db) return fallback;
+
+  try {
+    const [workspaceRows, contentRows, approvalRows, assetRows] = await Promise.all([
+      db.select().from(workspaces).limit(1),
+      db.select().from(contentItems),
+      db.select().from(approvals),
+      db.select().from(assets),
+    ]);
+    return {
+      mode: "database" as const,
+      workspace: workspaceRows[0] ?? { name: "Signal Notes", slug: "signal-notes" },
+      counts: {
+        content: contentRows.length || fallback.counts.content,
+        approvals: approvalRows.length || fallback.counts.approvals,
+        assets: assetRows.length || fallback.counts.assets,
+      },
+    };
+  } catch (error) {
+    console.warn("[Database] Workspace tables are not ready; using demo fallback:", error);
+    return fallback;
+  }
+}

@@ -1,0 +1,14 @@
+import { ArrowRight, Check, ChevronLeft, Sparkles, X } from "lucide-react";
+import { useState } from "react";
+import { Link } from "wouter";
+
+const plans = [
+  { name: "Solo", price: "$0", cadence: "forever", description: "For one person with a lot to make.", tone: "paper", features: ["1 workspace", "Unlimited ideas & briefs", "Calendar + production board", "Basic performance tracking"], cta: "Start for free" },
+  { name: "Creator Pro", price: "$16", cadence: "per member / month", description: "For creators ready to make the system theirs.", tone: "orange", popular: true, features: ["Everything in Solo", "Unlimited channels & brands", "Advanced saved views", "Client review links", "Priority support"], cta: "Try Pro free" },
+  { name: "Team", price: "$29", cadence: "per member / month", description: "For small teams who publish together.", tone: "dark", features: ["Everything in Pro", "Roles & permissions", "Approval workflows", "Team performance views", "Shared asset library"], cta: "Build a team" },
+];
+
+export default function Pricing() {
+  const [selectedPlan, setSelectedPlan] = useState("");
+  return <div className="pricing-page"><header className="pricing-nav"><Link href="/" className="landing-brand"><span className="brand-mark"><span /><span /><span /><span /></span><span>creatorgrid</span></Link><Link href="/" className="back-link"><ChevronLeft size={15} /> Back home</Link></header><main><div className="pricing-intro"><div className="eyebrow"><Sparkles size={14} /> Simple by design</div><h1>Make room for<br /><em>more making.</em></h1><p>Start small, find your rhythm, then bring the whole team in when the time is right.</p></div>{selectedPlan && <div className="success-banner pricing-success"><Check size={16} /><span><strong>{selectedPlan} test upgrade ready.</strong> This is a fictional checkout — no payment is taken.</span><button onClick={() => setSelectedPlan("")} aria-label="Dismiss"><X size={15} /></button></div>}<div className="plan-grid">{plans.map(plan => <article key={plan.name} className={`plan-card plan-${plan.tone}`}>{plan.popular && <div className="popular-pill">Most loved</div>}<div className="plan-top"><span className="plan-name">{plan.name}</span><span className="plan-spark">✦</span></div><p>{plan.description}</p><div className="plan-price">{plan.price}<small>{plan.cadence}</small></div><button onClick={() => setSelectedPlan(plan.name)} className={`button ${plan.tone === "dark" ? "button-light" : plan.tone === "orange" ? "button-dark" : "button-outline"}`}>{plan.cta} <ArrowRight size={15} /></button><div className="plan-divider" /> <ul>{plan.features.map(feature => <li key={feature}><Check size={15} /> {feature}</li>)}</ul></article>)}</div><div className="pricing-footnote"><span>All plans include fictional demo data so you can explore the workflow before you commit.</span><span>Need client-only access? <a href="mailto:hello@creatorgrid.app">Talk to us</a>.</span></div></main></div>;
+}
